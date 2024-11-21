@@ -1,39 +1,29 @@
-import express, { Request, Response } from "express";
-import bodyParser from "body-parser";
-import session from "express-session";
-import dotenv from "dotenv";
-import path from "path";
-
-dotenv.config();
-
-const app = express();
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const body_parser_1 = __importDefault(require("body-parser"));
+const express_session_1 = __importDefault(require("express-session"));
+const dotenv_1 = __importDefault(require("dotenv"));
+const path_1 = __importDefault(require("path"));
+dotenv_1.default.config();
+const app = (0, express_1.default)();
 const PORT = 3000;
-
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(
-  session({
+app.use(body_parser_1.default.urlencoded({ extended: true }));
+app.use((0, express_session_1.default)({
     secret: process.env.SECRET_KEY || "default_secret_key",
     resave: false,
     saveUninitialized: true,
-  })
-);
-
+}));
 // Serve static files from the "public" directory
-app.use(express.static(path.join(__dirname, "../public")));
-
-// Extend the Session interface
-declare module "express-session" {
-  interface Session {
-    user?: string;
-  }
-}
-
+app.use(express_1.default.static(path_1.default.join(__dirname, "../public")));
 // In-memory user store
-const users: { [key: string]: string } = {};
-
+const users = {};
 // Home route with registration form
-app.get("/", (req: Request, res: Response) => {
-  res.send(`
+app.get("/", (req, res) => {
+    res.send(`
     <html>
       <head>
         <link rel="stylesheet" type="text/css" href="/styles.css">
@@ -57,12 +47,11 @@ app.get("/", (req: Request, res: Response) => {
     </html>
   `);
 });
-
 // Handle registration form submission
-app.post("/register", (req: Request, res: Response) => {
-  const { username, password } = req.body;
-  if (users[username]) {
-    res.send(`
+app.post("/register", (req, res) => {
+    const { username, password } = req.body;
+    if (users[username]) {
+        res.send(`
       <html>
         <head>
           <link rel="stylesheet" type="text/css" href="/styles.css">
@@ -75,10 +64,11 @@ app.post("/register", (req: Request, res: Response) => {
         </body>
       </html>
     `);
-  } else {
-    users[username] = password;
-    console.log(`New user registered: ${username}`);
-    res.send(`
+    }
+    else {
+        users[username] = password;
+        console.log(`New user registered: ${username}`);
+        res.send(`
       <html>
         <head>
           <link rel="stylesheet" type="text/css" href="/styles.css">
@@ -91,12 +81,11 @@ app.post("/register", (req: Request, res: Response) => {
         </body>
       </html>
     `);
-  }
+    }
 });
-
 // Login form route
-app.get("/login", (req: Request, res: Response) => {
-  res.send(`
+app.get("/login", (req, res) => {
+    res.send(`
     <html>
       <head>
         <link rel="stylesheet" type="text/css" href="/styles.css">
@@ -118,13 +107,12 @@ app.get("/login", (req: Request, res: Response) => {
     </html>
   `);
 });
-
 // Handle login form submission
-app.post("/login", (req: Request, res: Response) => {
-  const { username, password } = req.body;
-  if (users[username] && users[username] === password) {
-    req.session.user = username;
-    res.send(`
+app.post("/login", (req, res) => {
+    const { username, password } = req.body;
+    if (users[username] && users[username] === password) {
+        req.session.user = username;
+        res.send(`
       <html>
         <head>
           <link rel="stylesheet" type="text/css" href="/styles.css">
@@ -137,8 +125,9 @@ app.post("/login", (req: Request, res: Response) => {
         </body>
       </html>
     `);
-  } else {
-    res.send(`
+    }
+    else {
+        res.send(`
       <html>
         <head>
           <link rel="stylesheet" type="text/css" href="/styles.css">
@@ -151,14 +140,13 @@ app.post("/login", (req: Request, res: Response) => {
         </body>
       </html>
     `);
-  }
+    }
 });
-
 // Logout route
-app.get("/logout", (req: Request, res: Response) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.send(`
+app.get("/logout", (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.send(`
         <html>
           <head>
             <link rel="stylesheet" type="text/css" href="/styles.css">
@@ -171,8 +159,8 @@ app.get("/logout", (req: Request, res: Response) => {
           </body>
         </html>
       `);
-    }
-    res.send(`
+        }
+        res.send(`
       <html>
         <head>
           <link rel="stylesheet" type="text/css" href="/styles.css">
@@ -185,13 +173,12 @@ app.get("/logout", (req: Request, res: Response) => {
         </body>
       </html>
     `);
-  });
+    });
 });
-
 // Page to display the username of the logged-in user
-app.get("/profile", (req: Request, res: Response) => {
-  if (req.session.user) {
-    res.send(`
+app.get("/profile", (req, res) => {
+    if (req.session.user) {
+        res.send(`
       <html>
         <head>
           <link rel="stylesheet" type="text/css" href="/styles.css">
@@ -204,8 +191,9 @@ app.get("/profile", (req: Request, res: Response) => {
         </body>
       </html>
     `);
-  } else {
-    res.send(`
+    }
+    else {
+        res.send(`
       <html>
         <head>
           <link rel="stylesheet" type="text/css" href="/styles.css">
@@ -218,10 +206,9 @@ app.get("/profile", (req: Request, res: Response) => {
         </body>
       </html>
     `);
-  }
+    }
 });
-
 // Start the server
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
